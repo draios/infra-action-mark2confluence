@@ -94,8 +94,8 @@ def publish(path: str)-> tuple:
 def has_mark_headers(path:str, header: str) -> bool:
   global space_re, title_re
   with open(path,'r+') as f:
-    data = f.read().split("\n")
-    for line in data:
+    data = f.read()
+    for line in data.split("\n"):
       if space_re.match(line):
         f.seek(0)
         f.truncate()
