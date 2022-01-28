@@ -93,20 +93,32 @@ def publish(path: str)-> tuple:
   return True, None
 
 
-def has_mark_headers(path:str, header: str) -> bool:
-  global space_re, is_comment_re
-  with open(path,'r+') as f:
+def has_mark_headers(path: str) -> bool:
+  global space_re
+  with open(path, 'r+') as f:
     data = f.read().split("\n")
-    for i in range(len(data)):
-      if not is_comment_re.match(data[i]) and not is_empty_line_re.match(data[i]):
-        data.insert(i+1,header)
-      if space_re.match(data[i]):
-        f.seek(0)
-        f.truncate()
-        f.write( "\n".join(data) )
-        f.flush()
+    for line in data:
+      if space_re.match(line):
         return True
   return False
+
+def inject_header(path: str, header: str) -> bool:
+  global is_comment_re, is_empty_line_re
+  injected = valid = False
+
+  with open(path, 'r+') as f:
+    data = f.read().split("\n")
+    i = 0
+    for line in data:
+      if not is_comment_re.match(line) and not is_empty_line_re.match(line) and not injected:
+        injected = True
+        data.insert(i, header)
+        f.seek(0)
+        f.truncate()
+        f.write("\n".join(data))
+        f.flush()
+      i += 1
+  return valid
 
 def main()->int:
   global cfg
@@ -153,12 +165,11 @@ def main()->int:
       header = tpl.render(source_link=source_link)
       # logger.info(f"Rendering template for {source_link}")
 
-      if not has_mark_headers(path, header):
+      if not has_mark_headers(path):
         logger.info(f"Skipping headerless file {path}")
         continue
 
-      with open(path, 'r') as f:
-        logger.debug(f.read)
+      inject_header(path, header)
 
       # publish file
       status[path] = publish(path)
