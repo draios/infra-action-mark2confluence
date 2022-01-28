@@ -92,15 +92,14 @@ def publish(path: str)-> tuple:
 
 
 def has_mark_headers(path:str, header: str) -> bool:
-  global space_re, title_re
+  global space_re
   with open(path,'r+') as f:
     data = f.read()
     for line in data.split("\n"):
       if space_re.match(line):
         f.seek(0)
         f.truncate()
-        f.write(header+"\n")
-        f.write(data)
+        f.write(header+"\n"+data)
         f.flush()
         return True
   return False
@@ -153,6 +152,9 @@ def main()->int:
       if not has_mark_headers(path, header):
         logger.info(f"Skipping headerless file {path}")
         continue
+
+      with open(path, 'r') as f:
+        logger.debug(f.read())
 
       # publish file
       status[path] = publish(path)
