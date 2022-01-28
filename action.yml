@@ -1,0 +1,34 @@
+name: 'Mark2Confluence'
+description: Uses kovetskiy/mark to publish markdown files to confluence pages
+inputs:
+  action:
+    description: "Action to perform: verify|dry-run|publish"
+    required: true
+  CONFLUENCE_USERNAME:
+    description: "Username for confluence"
+    required: true
+  CONFLUENCE_PASSWORD:
+    description: "Password for confluence"
+    required: true
+  CONFLUENCE_BASE_URL:
+    description: Confluence base url
+    required: true
+  DOC_DIR:
+    description: The root directory where to look for markdown files
+    required: false
+    default: ""
+  DOC_DIR_PATTERN:
+    description: "Regexp to filter markdown files"
+    required: false
+    default: ""
+  MODIFIED_INTERVAL:
+    description: "Evaluate only files newer than (in minutes)(default: 0 means is disabled) "
+    required: false
+    default: "0"
+  HEADER_TEMPLATE:
+    description: The header to add to each markadown files, this will jinja evaluated
+    required: false
+    default: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n"
+runs:
+  using: "docker"
+  image: Dockerfile

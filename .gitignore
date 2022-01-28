@@ -1,0 +1,4 @@
+.task/*
+.venv
+publish.sh
+main.sh

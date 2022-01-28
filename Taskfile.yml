@@ -1,0 +1,79 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task -l
+    silent: true
+
+  check:
+    desc: "Run pre-commit hooks"
+    cmds:
+      - pre-commit run -a
+
+  virtualenv:
+    cmds:
+      - python3 -m venv .venv
+    sources:
+      - .venv/bin/activate
+    generates:
+      - .venv/bin/activate
+    method: checksum
+
+  pre-commit:
+    cmds:
+      - pre-commit install
+    sources:
+      - .git/hooks/pre-commit
+      - .pre-commit-config.yaml
+    generates:
+      - .git/hooks/pre-commit
+    method: checksum
+
+  pre-commit-setup:
+    cmds:
+      - pip3 install pre-commit
+    status:
+      - which pre-commit
+
+  poetry-setup:
+    cmds:
+      - pip3 install poetry
+    status:
+      - which poetry
+
+  dependency-install:
+    cmds:
+      - source .venv/bin/activate
+      - pip3 install -r requirements.txt
+    sources:
+      - requirements.txt
+    method: checksum
+
+  setup:
+    desc: Bootstrap dev environment
+    preconditions:
+      - sh: "[ $(python3 --version | cut -d ' ' -f 2 | awk -F'.' '{print ($2 > 6) }') = 1 ]"
+        msg: "Required python version not found (>=3.6)"
+    cmds:
+      - task: pre-commit-setup
+      - task: virtualenv
+      - task: pre-commit
+      - task: dependency-install
+
+  test:
+    desc: Run tests
+    cmds:
+      - echo "Nothing to do"
+
+  clean:
+    desc: Cleanup
+    cmds:
+      - rm -rf ./dist
+
+  reset:
+      desc: Reset dev environment
+      cmds:
+        - rm -rf .venv .task
