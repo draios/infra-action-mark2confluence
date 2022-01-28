@@ -48,6 +48,8 @@ cfg =dot.dotify({
 })
 
 space_re = re.compile("\<\!\-\-.?[Ss]pace\:.*\-\-\>", re.MULTILINE)
+is_comment_re = re.compile("^\<\!\-\-", re.MULTILINE)
+is_empty_line_re = re.compile("^[ \n]*$")
 
 def load_vars():
   global cfg
@@ -92,14 +94,16 @@ def publish(path: str)-> tuple:
 
 
 def has_mark_headers(path:str, header: str) -> bool:
-  global space_re
+  global space_re, is_comment_re
   with open(path,'r+') as f:
-    data = f.read()
-    for line in data.split("\n"):
-      if space_re.match(line):
+    data = f.read().split("\n")
+    for i in range(len(data)):
+      if not is_comment_re.match(data[i]) and not is_empty_line_re.match(data[i]):
+        data.insert(i+1,header)
+      if space_re.match(data[i]):
         f.seek(0)
         f.truncate()
-        f.write(header+"\n"+data)
+        f.write( "\n".join(data) )
         f.flush()
         return True
   return False
@@ -154,7 +158,7 @@ def main()->int:
         continue
 
       with open(path, 'r') as f:
-        logger.debug(f.read())
+        logger.debug(f.read)
 
       # publish file
       status[path] = publish(path)
