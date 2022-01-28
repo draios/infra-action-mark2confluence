@@ -1,4 +1,3 @@
-from doctest import FAIL_FAST
 import os
 import shlex
 import sys
@@ -81,7 +80,7 @@ def publish(path: str)-> tuple:
   proc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd = os.path.dirname(path))
 
   try:
-    outs, errs = proc.communicate(timeout=120)
+    _, errs = proc.communicate(timeout=120)
   except subprocess.TimeoutExpired:
     proc.kill()
     _, errs = proc.communicate()
@@ -94,10 +93,15 @@ def publish(path: str)-> tuple:
 
 def has_mark_headers(path:str, header: str) -> bool:
   global space_re, title_re
-  with open(path,'r') as f:
+  with open(path,'r+') as f:
     data = f.read().split("\n")
     for line in data:
       if space_re.match(line):
+        f.seek(0)
+        f.truncate()
+        f.write(header+"\n")
+        f.write(data)
+        f.flush()
         return True
   return False
 
