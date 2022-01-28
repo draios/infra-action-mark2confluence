@@ -161,7 +161,7 @@ def main()->int:
           continue
 
       # render header template
-      source_link = f"{ cfg.github.SERVER_URL }/{ cfg.github.REPOSITORY }/blob/{ cfg.github.REF_NAME }/{ path.replace(cfg.github.WORKSPACE) }"
+      source_link = f"{ cfg.github.SERVER_URL }/{ cfg.github.REPOSITORY }/blob/{ cfg.github.REF_NAME }/{ path.replace(cfg.github.WORKSPACE, "") }"
       header = tpl.render(source_link=source_link)
       # logger.info(f"Rendering template for {source_link}")
 
