@@ -101,7 +101,7 @@ def has_mark_headers(path:str, header: str) -> bool:
         return True
   return False
 
-def main():
+def main()->int:
   global cfg
   load_vars()
 
@@ -123,9 +123,10 @@ def main():
   for root, dirs, files in os.walk( topdir ,topdown=True, followlinks=False):
 
     for file in files:
+      # Skip files that without .md extension
       if file[-3:] != '.md': continue
 
-      # validate regexp
+      # validate regexp on filepath
       path = os.path.join(root,file)
       if pattern.match(path) is None:
         logger.info(f"Doesn't match DOC_DIR_PATTERN, skipping {path}")
@@ -152,13 +153,14 @@ def main():
       # publish file
       status[path] = publish(path)
 
+  # Calculate counters and exit code
   rc = 0
   for k, v in status.items():
     if not v[0]:
       rc += 1
       logger.error(f"{k} {v[1]}")
   logger.info(f"Success: {len(status)-rc} | Failures: {rc} | Total: {len(status)}")
-  exit(rc)
+  return rc
 
 if __name__ == "__main__":
-  main()
+  exit(main())
