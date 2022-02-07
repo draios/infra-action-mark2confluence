@@ -74,3 +74,35 @@ jobs:
 
 
 ```
+
+## Upload only changed files
+
+```yaml
+name: Docs Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pull_request:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: tj-actions/changed-files@v14.3
+      id: changed-files
+      with:
+        since_last_remote_commit: "true"
+
+    - name: Test docs generation
+      uses: draios/infra-action-mark2confluence@main
+      with:
+        action: "publish"
+        FILES: ${{ steps.changed-filed.outputs.all_changed_files }}
+        CONFLUENCE_BASE_URL: https://sysdig.atlassian.net/wiki
+        CONFLUENCE_USERNAME: ${{ secrets.CONFLUENCE_USERNAME }}
+        CONFLUENCE_PASSWORD: ${{ secrets.CONFLUENCE_PASSWORD }}
+
+```
