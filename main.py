@@ -134,6 +134,7 @@ def main()->int:
     topdir = os.path.join(cfg.github.WORKSPACE, cfg.inputs.DOC_DIR)
   except Exception as e:
     logger.error(f"Setup error: {e}")
+    exit(1)
 
   logger.info(f"Searching into {topdir}")
 
