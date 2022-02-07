@@ -24,6 +24,7 @@ ENV_PREFIXES = {
 DEFAULT_INPUTS = {
   "DOC_DIR": "",
   "DOC_DIR_PATTERN": ".*",
+  "FILES": "",
   "ACTION": ACTION_DRY_RUN,
   "LOGURU_LEVEL": "INFO",
   "HEADER_TEMPLATE": "---\n\n**WARNING**: This page is automatically generated from [this source code]({{ source_link }})\n\n---\n",
@@ -120,63 +121,73 @@ def inject_header(path: str, header: str) -> bool:
       i += 1
   return valid
 
-def main()->int:
+def get_files_by_doc_dir_pattern() -> list():
   global cfg
-  load_vars()
 
   try:
-    # Compile regex pattern
-    pattern: re.Pattern = re.compile(cfg.inputs.DOC_DIR_PATTERN)
-    # Compile header template
-    tpl = jinja2.Template(cfg.inputs.HEADER_TEMPLATE)
-
-    # Search into the right directory (this runs into a docker container)
-    topdir = os.path.join(cfg.github.WORKSPACE, cfg.inputs.DOC_DIR)
+    pattern = re.compile(cfg.inputs.DOC_DIR_PATTERN)
   except re.error as e:
     logger.error(f"Setup error, DOC_DIR_PATTERN: {e}")
     exit(1)
-  except jinja2.exceptions.TemplateError as e:
-    logger.error(f"Setup error, HEADER_TEMPLATE: {e}")
-    exit(1)
 
+  topdir = os.path.join(cfg.github.WORKSPACE, cfg.inputs.DOC_DIR)
   logger.info(f"Searching into {topdir}")
 
-  status = {}
-
+  filtered_files = []
   for root, dirs, files in os.walk( topdir ,topdown=True, followlinks=False):
 
     for file in files:
-      # Skip files that without .md extension
-      if file[-3:] != '.md': continue
-
       # validate regexp on filepath
       path = os.path.join(root,file)
       if pattern.match(path) is None:
         logger.info(f"Doesn't match DOC_DIR_PATTERN, skipping {path}")
-        continue
 
       ## validate modified time
-      if int(cfg.inputs.MODIFIED_INTERVAL) > 0:
+      elif int(cfg.inputs.MODIFIED_INTERVAL) > 0:
         mtime: datetime = datetime.fromtimestamp(os.stat(path).st_mtime)
         diff = (datetime.now() -
                 timedelta(minutes=int(cfg.inputs.MODIFIED_INTERVAL)))
         if mtime < diff:
           logger.info(f"Is too old, skipping ({mtime}) {path}")
-          continue
+      else:
+        filtered_files.append(path)
 
-      # render header template
+    return filtered_files
+
+def main()->int:
+  global cfg
+  load_vars()
+
+  try:
+    tpl = jinja2.Template(cfg.inputs.HEADER_TEMPLATE)
+  except jinja2.exceptions.TemplateError as e:
+    logger.error(f"Setup error, HEADER_TEMPLATE: {e}")
+    exit(1)
+
+  files = []
+  if cfg.inputs.FILES:
+    files = list(map(
+      lambda file: f"{cfg.github.WORKSPACE}/{file}",
+      cfg.inputs.FILES.split(" ")
+    ))
+  else:
+    files = get_files_by_doc_dir_pattern()
+
+  logger.info(f"Files to be processed: {', '.join(files)}")
+
+
+  status = {}
+  for path in files:
+    if path[-3:] == '.md' and has_mark_headers(path):
+      logger.info(f"Processing file {path}")
       source_link = f"{ cfg.github.SERVER_URL }/{ cfg.github.REPOSITORY }/blob/{ cfg.github.REF_NAME }/{ path.replace(cfg.github.WORKSPACE, '') }"
       header = tpl.render(source_link=source_link)
-      # logger.info(f"Rendering template for {source_link}")
-
-      if not has_mark_headers(path):
-        logger.info(f"Skipping headerless file {path}")
-        continue
 
       inject_header(path, header)
 
-      # publish file
       status[path] = publish(path)
+    else:
+      logger.info(f"Skipping headerless or non md file {path}")
 
   # Calculate counters and exit code
   rc = 0

@@ -26,6 +26,13 @@ CONFLUENCE_PASSWORD: ${{ secrets.CONFLUENCE_PASSWORD }} # CONFLUENCE_PASSWORD (C
 HEADER_TEMPLATE: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n" # This is a jinja template used as header, source_link is automatically resolved as github source url of the current file
 ```
 
+## Optional environment variables
+
+```yaml
+FILES: "" # space separated list of file to upload (relative to the repo root directory).
+          # if FILES is defined; DOC_DIR, DOC_DIR_PATTERN and MODIFIED_INTERVAL are ignored
+```
+
 ## Example workflow
 
 
