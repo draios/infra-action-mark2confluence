@@ -132,8 +132,11 @@ def main()->int:
 
     # Search into the right directory (this runs into a docker container)
     topdir = os.path.join(cfg.github.WORKSPACE, cfg.inputs.DOC_DIR)
-  except Exception as e:
-    logger.error(f"Setup error: {e}")
+  except re.error as e:
+    logger.error(f"Setup error, DOC_DIR_PATTERN: {e}")
+    exit(1)
+  except jinja2.exceptions.TemplateError as e:
+    logger.error(f"Setup error, HEADER_TEMPLATE: {e}")
     exit(1)
 
   logger.info(f"Searching into {topdir}")
