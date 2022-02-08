@@ -26,6 +26,13 @@ CONFLUENCE_PASSWORD: ${{ secrets.CONFLUENCE_PASSWORD }} # CONFLUENCE_PASSWORD (C
 HEADER_TEMPLATE: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n" # This is a jinja template used as header, source_link is automatically resolved as github source url of the current file
 ```
 
+## Optional environment variables
+
+```yaml
+FILES: "" # space separated list of file to upload (relative to the repo root directory).
+          # if FILES is defined; DOC_DIR, DOC_DIR_PATTERN and MODIFIED_INTERVAL are ignored
+```
+
 ## Example workflow
 
 
@@ -65,5 +72,42 @@ jobs:
         CONFLUENCE_USERNAME: ${{ secrets.CONFLUENCE_USERNAME }}
         CONFLUENCE_PASSWORD: ${{ secrets.CONFLUENCE_PASSWORD }}
 
+
+```
+
+## Verify and publish only changed files
+
+```yaml
+name: Docs verification and publish
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+  push:
+    branches: main
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # For pushes getting the diff from the previous commit might be tricky:
+        # if you squash and merge you will create only one new commit, so you
+        # can set 2 as fetch-depth. But if you are rebasing and merging or
+        # creating a merge commit you might end up with a long history of
+        # new commits, to fetch the previous working commit you should set
+        # the fetch-depth to 0 (full history) or an arbitrary value to
+        # cover the commit history.
+        fetch-depth: ${{ github.event_name == 'pull_request' && 1 || 0 }}
+
+    - uses: tj-actions/changed-files@v14.3
+      id: changed-files
+
+    - uses: draios/infra-action-mark2confluence@main
+      with:
+        action: "${{ github.event_name == 'push' && 'publish' || 'dry-run' }}"
+        FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        CONFLUENCE_BASE_URL: https://your.atlassian.net/wiki
+        CONFLUENCE_USERNAME: ${{ secrets.CONFLUENCE_USERNAME }}
+        CONFLUENCE_PASSWORD: ${{ secrets.CONFLUENCE_PASSWORD }}
 
 ```

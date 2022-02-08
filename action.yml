@@ -25,8 +25,12 @@ inputs:
     description: "Evaluate only files newer than (in minutes)(default: 0 means is disabled) "
     required: false
     default: "0"
+  FILES:
+    description: "Space separated list of files. When specified, the action only process the files in the list"
+    required: false
+    default: ""
   HEADER_TEMPLATE:
-    description: The header to add to each markadown files, this will jinja evaluated
+    description: The header to add to each markdown files, this will jinja evaluated
     required: false
     default: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n"
 runs:
