@@ -75,26 +75,36 @@ jobs:
 
 ```
 
-## Verify only changed files
+## Verify and publish only changed files
 
 ```yaml
-name: Docs Verification
+name: Docs verification and publish
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
+  push:
+    branches: main
 jobs:
-  verify-markdowns:
+  documentation:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        # For pushes getting the diff from the previous commit might be tricky:
+        # if you squash and merge you will create only one new commit, so you
+        # can set 2 as fetch-depth. But if you are rebasing and merging or
+        # creating a merge commit you might end up with a long history of
+        # new commits, to fetch the previous working commit you should set
+        # the fetch-depth to 0 (full history) or an arbitrary value to
+        # cover the commit history.
+        fetch-depth: ${{ github.event_name == 'pull_request' && 1 || 0 }}
 
     - uses: tj-actions/changed-files@v14.3
       id: changed-files
 
-    - name: Test docs generation
-      uses: draios/infra-action-mark2confluence@main
+    - uses: draios/infra-action-mark2confluence@main
       with:
-        action: "dry-run"
+        action: "${{ github.event_name == 'push' && 'publish' || 'dry-run' }}"
         FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         CONFLUENCE_BASE_URL: https://your.atlassian.net/wiki
         CONFLUENCE_USERNAME: ${{ secrets.CONFLUENCE_USERNAME }}
