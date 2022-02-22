@@ -152,7 +152,7 @@ def get_files_by_doc_dir_pattern() -> list():
       else:
         filtered_files.append(path)
 
-    return filtered_files
+  return filtered_files
 
 def main()->int:
   global cfg
