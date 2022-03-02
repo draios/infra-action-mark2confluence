@@ -27,7 +27,7 @@ DEFAULT_INPUTS = {
   "FILES": "",
   "ACTION": ACTION_DRY_RUN,
   "LOGURU_LEVEL": "INFO",
-  "HEADER_TEMPLATE": "---\n\n**WARNING**: This page is automatically generated from [this source code]({{ source_link }})\n\n---\n",
+  "HEADER_TEMPLATE": "---\n\n**WARNING**: This page is automatically generated from [this source code]({{ source_link }})\n\n---\n<!-- Include: ac:toc -->",
   "MODIFIED_INTERVAL": "0",
   "CONFLUENCE_PASSWORD": "",
   "CONFLUENCE_USERNAME": "",
