@@ -6,7 +6,14 @@ import mark2confluence.main as main
 
 RESOURCE_DIR = "tests/resources"
 
+def clean_github_environment_variables():
+    if(os.getenv("CI", False)):
+        for env_var in os.environ.keys():
+            if env_var.startswith("GITHUB"):
+                os.environ.pop(env_var)
+
 def test_load_vars_without_env():
+    clean_github_environment_variables()
     main.load_vars()
     assert main.cfg.inputs == main.DEFAULT_INPUTS
     assert main.cfg.github == main.DEFAULT_GITHUB
