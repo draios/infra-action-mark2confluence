@@ -154,15 +154,19 @@ def get_files_by_doc_dir_pattern() -> list():
 
   return filtered_files
 
+def check_header_template(header_template: str):
+  try:
+    return jinja2.Template(header_template)
+  except jinja2.exceptions.TemplateError as e:
+    logger.error(f"Setup error, HEADER_TEMPLATE: {e}")
+    exit(1)
+
+
 def main()->int:
   global cfg
   load_vars()
 
-  try:
-    tpl = jinja2.Template(cfg.inputs.HEADER_TEMPLATE)
-  except jinja2.exceptions.TemplateError as e:
-    logger.error(f"Setup error, HEADER_TEMPLATE: {e}")
-    exit(1)
+  tpl = check_header_template(cfg.inputs.HEADER_TEMPLATE)
 
   files = []
   if cfg.inputs.FILES:

@@ -2,3 +2,4 @@
 .venv
 publish.sh
 main.sh
+__pycache__

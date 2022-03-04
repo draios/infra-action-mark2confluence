@@ -20,4 +20,4 @@ ENV PYTHONPATH /app
 ENV DOC_PREFIX /github/workspace/
 ENV LOGURU_FORMAT "<lvl>{level:7} {message}</lvl>"
 ENTRYPOINT [ "python" ]
-CMD ["/app/main.py"]
+CMD ["/app/src/main.py"]
