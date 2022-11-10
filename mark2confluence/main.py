@@ -92,7 +92,7 @@ def publish(path: str)-> tuple:
 
 
 def has_mark_headers(path: str) -> bool:
-  space_re = re.compile("\<\!\-\-.?[Ss]pace\:.*\-\-\>", re.MULTILINE)
+  space_re = re.compile("<!--.?[Ss]pace:.*-->", re.MULTILINE)
   with open(path, 'r+') as f:
     data = f.read().split("\n")
     for line in data:
@@ -105,11 +105,11 @@ class CommentIsOpenException(Exception):
 
 def inject_header_after_mark_headers(path: str, header: str) -> tuple[list[str], int]:
   def is_comment_line(line: str):
-    return re.compile("^\<\!\-\-.*\-\-\>$").match(line.strip())
+    return re.compile("^<!--.*-->$").match(line.strip())
   def is_opening_comment_line(line: str):
-    return re.compile("^\<\!\-\-").match(line.strip()) and not is_comment_line(line)
+    return re.compile("^<!--").match(line.strip()) and not is_comment_line(line)
   def is_closing_comment_line(line: str):
-    return re.compile("\-\-\>$").match(line.strip()) and not is_comment_line(line)
+    return re.compile("-->$").match(line.strip()) and not is_comment_line(line)
 
   file_lines = list()
   with open(path, 'r') as f:
