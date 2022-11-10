@@ -4,6 +4,7 @@ import sys
 import re
 import subprocess
 from datetime import datetime,timedelta
+from typing import List, Tuple
 import jinja2
 from loguru import logger
 from supermutes import dot
@@ -103,7 +104,7 @@ def has_mark_headers(path: str) -> bool:
 class MultilineCommentIsOpenException(Exception):
     pass
 
-def inject_header_before_first_line_of_content(path: str, header: str) -> tuple[list[str], int]:
+def inject_header_before_first_line_of_content(path: str, header: str) -> Tuple[List[str], int]:
   def is_comment_line(line: str) -> bool:
     return re.compile("^<!--.*-->$").match(line.strip())
   def is_opening_comment_line(line: str) -> bool:
