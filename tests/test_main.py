@@ -60,9 +60,9 @@ def test_inject_header(file, expected_index, raises):
     shutil.copyfile(test_path, temp_path)
     header = main.DEFAULT_INPUTS["HEADER_TEMPLATE"]
     if raises:
-        with pytest.raises(main.CommentIsOpenException):
-            main.inject_header_after_mark_headers(temp_path, header)
+        with pytest.raises(main.MultilineCommentIsOpenException):
+            main.inject_header_before_first_line_of_content(temp_path, header)
     else:
-        lines, injected_at_index = main.inject_header_after_mark_headers(temp_path, header)
+        lines, injected_at_index = main.inject_header_before_first_line_of_content(temp_path, header)
         assert injected_at_index == expected_index
         assert lines[injected_at_index] == header

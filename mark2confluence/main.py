@@ -100,15 +100,15 @@ def has_mark_headers(path: str) -> bool:
         return True
   return False
 
-class CommentIsOpenException(Exception):
+class MultilineCommentIsOpenException(Exception):
     pass
 
-def inject_header_after_mark_headers(path: str, header: str) -> tuple[list[str], int]:
-  def is_comment_line(line: str):
+def inject_header_before_first_line_of_content(path: str, header: str) -> tuple[list[str], int]:
+  def is_comment_line(line: str) -> bool:
     return re.compile("^<!--.*-->$").match(line.strip())
-  def is_opening_comment_line(line: str):
+  def is_opening_comment_line(line: str) -> bool:
     return re.compile("^<!--").match(line.strip()) and not is_comment_line(line)
-  def is_closing_comment_line(line: str):
+  def is_closing_comment_line(line: str) -> bool:
     return re.compile("-->$").match(line.strip()) and not is_comment_line(line)
 
   file_lines = list()
@@ -116,18 +116,18 @@ def inject_header_after_mark_headers(path: str, header: str) -> tuple[list[str],
     file_lines = f.readlines()
 
   beginning_of_content_index = 0
-  comment_is_open = False
+  is_inside_multiline_comment = False
   for line in file_lines:
       if is_opening_comment_line(line):
-        comment_is_open = True
+        is_inside_multiline_comment = True
       elif is_closing_comment_line(line):
-        comment_is_open = False
-      elif line.strip() and not is_comment_line(line) and not comment_is_open:
+        is_inside_multiline_comment = False
+      elif line.strip() != "" and not is_inside_multiline_comment and not is_comment_line(line):
         break
       beginning_of_content_index += 1
 
-  if comment_is_open:
-    raise CommentIsOpenException(f"The file {path} has multiline comments in it that are not closed.")
+  if is_inside_multiline_comment:
+    raise MultilineCommentIsOpenException(f"The file {path} has multiline comments in it that are not closed.")
 
   file_lines.insert(beginning_of_content_index, header)
   with open(path, "w") as f:
@@ -201,7 +201,7 @@ def main()->int:
       source_link = f"{ cfg.github.SERVER_URL }/{ cfg.github.REPOSITORY }/blob/{ cfg.github.REF_NAME }/{ path.replace(cfg.github.WORKSPACE, '') }"
       header = tpl.render(source_link=source_link)
 
-      inject_header_after_mark_headers(path, header)
+      inject_header_before_first_line_of_content(path, header)
 
       status[path] = publish(path)
     else:
