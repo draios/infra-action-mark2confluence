@@ -48,9 +48,6 @@ cfg =dot.dotify({
   "runner": {},
 })
 
-space_re = re.compile("\<\!\-\-.?[Ss]pace\:.*\-\-\>", re.MULTILINE)
-is_comment_re = re.compile("^\<\!\-\-", re.MULTILINE)
-is_empty_line_re = re.compile("^[ \n]*$")
 
 def load_vars():
   global cfg
@@ -95,7 +92,7 @@ def publish(path: str)-> tuple:
 
 
 def has_mark_headers(path: str) -> bool:
-  global space_re
+  space_re = re.compile("\<\!\-\-.?[Ss]pace\:.*\-\-\>", re.MULTILINE)
   with open(path, 'r+') as f:
     data = f.read().split("\n")
     for line in data:
@@ -103,23 +100,40 @@ def has_mark_headers(path: str) -> bool:
         return True
   return False
 
-def inject_header(path: str, header: str) -> bool:
-  global is_comment_re, is_empty_line_re
-  injected = valid = False
+class CommentIsOpenException(Exception):
+    pass
 
-  with open(path, 'r+') as f:
-    data = f.read().split("\n")
-    i = 0
-    for line in data:
-      if not is_comment_re.match(line) and not is_empty_line_re.match(line) and not injected:
-        injected = True
-        data.insert(i, header)
-        f.seek(0)
-        f.truncate()
-        f.write("\n".join(data))
-        f.flush()
-      i += 1
-  return valid
+def inject_header_after_mark_headers(path: str, header: str) -> tuple[list[str], int]:
+  def is_comment_line(line: str):
+    return re.compile("^\<\!\-\-.*\-\-\>$").match(line.strip())
+  def is_opening_comment_line(line: str):
+    return re.compile("^\<\!\-\-").match(line.strip()) and not is_comment_line(line)
+  def is_closing_comment_line(line: str):
+    return re.compile("\-\-\>$").match(line.strip()) and not is_comment_line(line)
+
+  file_lines = list()
+  with open(path, 'r') as f:
+    file_lines = f.readlines()
+
+  beginning_of_content_index = 0
+  comment_is_open = False
+  for line in file_lines:
+      if is_opening_comment_line(line):
+        comment_is_open = True
+      elif is_closing_comment_line(line):
+        comment_is_open = False
+      elif line.strip() and not is_comment_line(line) and not comment_is_open:
+        break
+      beginning_of_content_index += 1
+
+  if comment_is_open:
+    raise CommentIsOpenException(f"The file {path} has multiline comments in it that are not closed.")
+
+  file_lines.insert(beginning_of_content_index, header)
+  with open(path, "w") as f:
+    f.writelines(file_lines)
+  return (file_lines, beginning_of_content_index)
+
 
 def get_files_by_doc_dir_pattern() -> list():
   global cfg
@@ -187,7 +201,7 @@ def main()->int:
       source_link = f"{ cfg.github.SERVER_URL }/{ cfg.github.REPOSITORY }/blob/{ cfg.github.REF_NAME }/{ path.replace(cfg.github.WORKSPACE, '') }"
       header = tpl.render(source_link=source_link)
 
-      inject_header(path, header)
+      inject_header_after_mark_headers(path, header)
 
       status[path] = publish(path)
     else:
