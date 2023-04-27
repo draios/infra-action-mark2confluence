@@ -6,7 +6,7 @@ WORKDIR /app
 RUN pip install --target=/app -r requirements.txt
 
 FROM python:3-slim
-ENV MARK="8.1"
+ENV MARK="9.2.1"
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y tar curl sudo && \
   rm -rf /var/lib/apt/lists/*
 RUN curl -LO https://github.com/kovetskiy/mark/releases/download/${MARK}/mark_${MARK}_Linux_x86_64.tar.gz && \
