@@ -13,6 +13,14 @@ RUN curl -LO https://github.com/kovetskiy/mark/releases/download/${MARK}/mark_${
   tar -xvzf mark_${MARK}_Linux_x86_64.tar.gz && \
   chmod +x mark && \
   sudo mv mark /usr/local/bin/mark
+  
+# mermaid-go mermaid provider would err "google-chrome: executable file not found" if google chrome executable is not present
+ENV DEBIAN_FRONTEND="noninteractive"
+RUN apt-get update && apt-get install -y wget
+RUN apt-get update && apt-get install -y gnupg2
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \ 
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
+RUN apt-get update && apt-get -y install google-chrome-stable
 
 COPY --from=builder /app /app
 WORKDIR /app
