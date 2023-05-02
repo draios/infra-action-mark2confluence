@@ -34,7 +34,7 @@ inputs:
     required: false
     default: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n<!-- Include: ac:toc -->"
   MERMAID_PROVIDER:
-    description: Defines the mermaid provider to use. Supported options are: cloudscript, mermaid-go
+    description: "Defines the mermaid provider to use. Supported options are: cloudscript, mermaid-go"
     required: false
     default: "cloudscript"
 runs:
