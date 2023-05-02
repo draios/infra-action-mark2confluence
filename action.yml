@@ -36,7 +36,7 @@ inputs:
   MERMAID_PROVIDER:
     description: "Defines the mermaid provider to use. Supported options are: cloudscript, mermaid-go"
     required: false
-    default: "cloudscript"
+    default: ""
 runs:
   using: "docker"
   image: Dockerfile
