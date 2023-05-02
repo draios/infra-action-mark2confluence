@@ -33,7 +33,7 @@ DEFAULT_INPUTS = {
   "CONFLUENCE_PASSWORD": "",
   "CONFLUENCE_USERNAME": "",
   "CONFLUENCE_BASE_URL": "",
-  "MERMAID_PROVIDER": "cloudscript",
+  "MERMAID_PROVIDER": "",
 }
 
 DEFAULT_GITHUB = {
@@ -77,7 +77,11 @@ def publish(path: str)-> tuple:
   elif cfg.inputs.ACTION == ACTION_VERIFY:
     other_args = "--compile-only"
 
-  cmd_line = f'mark -p "{cfg.inputs.CONFLUENCE_PASSWORD}" -u "{cfg.inputs.CONFLUENCE_USERNAME}" -b "{cfg.inputs.CONFLUENCE_BASE_URL}" --mermaid-provider "{cfg.inputs.MERMAID_PROVIDER}" {other_args} --color never --debug -f {path}'
+  mermaid_provider = ""
+  if cfg.inputs.MERMAID_PROVIDER:
+    mermaid_provider = f"--mermaid-provider {cfg.inputs.MERMAID_PROVIDER}"
+
+  cmd_line = f'mark -p "{cfg.inputs.CONFLUENCE_PASSWORD}" -u "{cfg.inputs.CONFLUENCE_USERNAME}" -b "{cfg.inputs.CONFLUENCE_BASE_URL}" {mermaid_provider} {other_args} --color never --debug -f {path}'
   args = shlex.split(cmd_line)
   proc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd = os.path.dirname(path))
 
