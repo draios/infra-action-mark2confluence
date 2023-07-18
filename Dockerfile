@@ -8,7 +8,6 @@ RUN pip install --target=/app -r requirements.txt && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y tar curl gnupg2 && \
     rm -rf /var/lib/apt/lists/* && \
     curl -LO https://github.com/kovetskiy/mark/releases/download/${MARK}/mark_Linux_x86_64.tar.gz && \
-    ls -l && \
     tar -xvzf mark_Linux_x86_64.tar.gz && chmod +x mark && mv mark /usr/local/bin/mark \
     && curl -L https://dl-ssl.google.com/linux/linux_signing_key.pub |apt-key add - \
     && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
