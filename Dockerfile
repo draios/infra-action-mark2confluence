@@ -1,5 +1,5 @@
 FROM python:3-slim AS builder
-ENV MARK="9.7.0"
+ENV MARK="9.9.0"
 
 ADD . /app
 WORKDIR /app
