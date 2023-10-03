@@ -32,7 +32,7 @@ inputs:
   HEADER_TEMPLATE:
     description: The header to add to each markdown files, this will jinja evaluated
     required: false
-    default: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n<!-- Include: ac:toc -->"
+    default: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n<!-- Include: ac:toc -->\n\n"
   MERMAID_PROVIDER:
     description: "Defines the mermaid provider to use. Supported options are: cloudscript, mermaid-go"
     required: false

@@ -17,20 +17,21 @@ This Action uses [mark](https://github.com/kovetskiy/mark) to accomplish this ta
 ## Required Environment variables
 
 ```yaml
-BASE_URL: https://your.confluence.url # Confluence base url of your instance
-DOC_DIR: docs # Docs directory based on the git repo root
-DOC_DIR_PATTERN: ".*" # Regexp to filter markdown files
-MODIFIED_INTERVAL: "0" # Last modified files in minutes
 CONFLUENCE_USERNAME: ${{ secrets.CONFLUENCE_USERNAME }} # CONFLUENCE_USERNAME (Confluence username) must be set in GitHub Repo secrets
 CONFLUENCE_PASSWORD: ${{ secrets.CONFLUENCE_PASSWORD }} # CONFLUENCE_PASSWORD (Confluence api key) must be set in GitHub Repo secrets
-HEADER_TEMPLATE: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n" # This is a jinja template used as header, source_link is automatically resolved as github source url of the current file
+CONFLUENCE_BASE_URL: https://sysdig.atlassian.net/wiki # Confluence base url
 ```
 
 ## Optional environment variables
 
 ```yaml
+DOC_DIR: docs # Docs directory based on the git repo root
+DOC_DIR_PATTERN: ".*" # Regexp to filter markdown files
+MODIFIED_INTERVAL: "0" # Last modified files in minutes
 FILES: "" # space separated list of file to upload (relative to the repo root directory).
           # if FILES is defined; DOC_DIR, DOC_DIR_PATTERN and MODIFIED_INTERVAL are ignored
+HEADER_TEMPLATE: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n<!-- Include: ac:toc -->\n\n" # This is a jinja template used as header, source_link is automatically resolved as github source url of the current file
+MERMAID_PROVIDER: "" # Defines the mermaid provider to use. Supported options are: cloudscript, mermaid-go
 ```
 
 ## Example workflow
