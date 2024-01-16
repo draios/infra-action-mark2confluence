@@ -24,10 +24,10 @@ ENV PYTHONPATH /app
 ENV DOC_PREFIX /github/workspace/
 ENV LOGURU_FORMAT "<lvl>{level:7} {message}</lvl>"
 ENV PATH="${PATH}:/opt/google/chrome"
-RUN useradd -ms /bin/bash mark2confluence && \
-    chown -R mark2confluence:mark2confluence /app && \
-    chmod -R 755 /app && \
-    usermod -aG users mark2confluence
-USER mark2confluence:users
+# RUN useradd -ms /bin/bash mark2confluence && \
+#     chown -R mark2confluence:mark2confluence /app && \
+#     chmod -R 755 /app && \
+#     usermod -aG users mark2confluence
+# USER mark2confluence:users
 ENTRYPOINT [ "python" ]
 CMD ["/app/mark2confluence/main.py"]
