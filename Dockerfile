@@ -11,7 +11,8 @@ RUN pip install --target=/app -r requirements.txt && \
     tar -xvzf mark_Linux_x86_64.tar.gz && chmod +x mark && mv mark /usr/local/bin/mark \
     && curl -L https://dl-ssl.google.com/linux/linux_signing_key.pub |apt-key add - \
     && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
-    && apt update && apt-get install -y google-chrome-stable
+    && apt update && apt-get install -y google-chrome-stable \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # FROM python:3.11-slim-bookworm
 # COPY --from=builder /app /app
@@ -23,6 +24,10 @@ ENV PYTHONPATH /app
 ENV DOC_PREFIX /github/workspace/
 ENV LOGURU_FORMAT "<lvl>{level:7} {message}</lvl>"
 ENV PATH="${PATH}:/opt/google/chrome"
-USER nobody:nogroup
+RUN useradd -ms /bin/bash mark2confluence && \
+    chown -R mark2confluence:mark2confluence /app && \
+    chmod -R 755 /app && \
+    usermod -aG users mark2confluence
+USER mark2confluence:users
 ENTRYPOINT [ "python" ]
 CMD ["/app/mark2confluence/main.py"]
