@@ -1,5 +1,5 @@
 FROM python:3.11-slim-bookworm AS builder
-ENV MARK="9.11.1"
+ENV MARK="9.11.0"
 
 ADD . /app
 WORKDIR /app
