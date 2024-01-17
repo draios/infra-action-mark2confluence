@@ -26,5 +26,5 @@ ENV PYTHONPATH /app
 ENV DOC_PREFIX /github/workspace/
 ENV LOGURU_FORMAT "<lvl>{level:7} {message}</lvl>"
 ENV PATH="${PATH}:/opt/google/chrome"
-ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python3" ]
 CMD ["/app/mark2confluence/main.py"]
