@@ -23,7 +23,7 @@ WORKDIR /usr/src/app
 
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/ \
-    CHROMIUM_FLAGS="--disable-software-rasterizer --disable-dev-shm-usage --no-sandbox --headless"
+    CHROMIUM_FLAGS="--disable-software-rasterizer --disable-dev-shm-usage --no-sandbox --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222"
 
 ENV PYTHONPATH /usr/src/app
 ENV DOC_PREFIX /github/workspace/
