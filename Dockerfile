@@ -13,7 +13,7 @@ RUN apk upgrade --no-cache --available \
     tar -xvzf mark_Linux_x86_64.tar.gz && chmod +x mark && mv mark /usr/local/bin/mark
 
 RUN mkdir -p /usr/src/app \
-    && adduser -D mark \
+    && adduser -D -u 1001 mark \
     && chown -R mark:mark /usr/src/app
 USER mark
 WORKDIR /usr/src/app
