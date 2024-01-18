@@ -23,7 +23,7 @@ WORKDIR /usr/src/app
 
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/ \
-    CHROMIUM_FLAGS="--disable-software-rasterizer --disable-dev-shm-usage"
+    CHROMIUM_FLAGS="--disable-software-rasterizer --disable-dev-shm-usage --no-sandbox --headless"
 
 ENV PYTHONPATH /usr/src/app
 ENV DOC_PREFIX /github/workspace/
