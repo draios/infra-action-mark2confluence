@@ -181,6 +181,27 @@ def check_header_template(header_template: str):
     logger.error(f"Setup error, HEADER_TEMPLATE: {e}")
     exit(1)
 
+def _parse_parents_string(parents_string: str) -> Tuple[str, str, List[str]]:
+  dir_separator = "="
+  spaces_separator = "->"
+  try:
+    parents_string_regex = re.compile(rf".+=.+({spaces_separator}.+)*")
+    if not parents_string_regex.match(parents_string) or parents_string.endswith(spaces_separator):
+      raise ValueError
+    directory, space_and_parents = parents_string.split(dir_separator)
+    space_and_parents_splitted = space_and_parents.split(spaces_separator)
+    space = space_and_parents_splitted[0]
+    parents = space_and_parents_splitted[1::]
+
+    if not directory or not space:
+      raise ValueError
+
+
+    return directory, space, parents
+  except ValueError:
+    msg = f"default_parents must follow the format DIR=SPACE[->PARENT1->PARENT2], provided: {parents_string}"
+    logger.error(msg)
+    raise ValueError(msg)
 
 def main()->int:
   global cfg

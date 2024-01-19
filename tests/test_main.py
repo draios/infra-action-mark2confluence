@@ -66,3 +66,24 @@ def test_inject_header(file, expected_index, raises):
         lines, injected_at_index = main.inject_header_before_first_line_of_content(temp_path, header)
         assert injected_at_index == expected_index
         assert lines[injected_at_index] == header
+@pytest.mark.parametrize(
+    "string,expected_dir,expected_space,expected_parents,raises",
+    [
+        ("tools/=foo->bar->baz", "tools/", "foo", ["bar", "baz"], False),
+        ("tools/=foo->bar", "tools/", "foo", ["bar"], False),
+        ("tools/=foo", "tools/", "foo", [], False),
+        ("tools/=", "tools/", "", [], True),
+        ("tools/", "", "", [], True),
+        ("tools/=foo->", "tools/", "foo", [], True),
+        ("=foo", "tools/", "foo", [], True),
+    ]
+)
+def test__parse_parents_string(string, expected_dir, expected_space, expected_parents, raises):
+    if raises:
+        with pytest.raises(ValueError, match=r"^default_parents.+"):
+            main._parse_parents_string(string)
+    else:
+        directory, space, parents = main._parse_parents_string(string)
+        assert directory == expected_dir
+        assert space == expected_space
+        assert parents == expected_parents
