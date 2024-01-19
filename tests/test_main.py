@@ -120,3 +120,26 @@ def test_get_default_parents(string, expected_parents_count):
 )
 def test_ParentCfg_get_header(cfg: main.ParentCfg, expected_header):
     assert cfg.get_header() == expected_header
+
+def test_inject_default_parents():
+    base_dir = f"{RESOURCE_DIR}/markdown/test_inject_default_parents"
+    source_file_path = f"{base_dir}/0-input.md"
+    expected_file_path = f"{base_dir}/0-output.md"
+    parsed_file_path = "tests/parsed_file.md"
+    cfgs = [
+        main.ParentCfg(directory="tests/", space="FOO", parents=["BAR"]),
+        main.ParentCfg(directory="mark2confluence/", space="BOZ", parents=["BIZ"]),
+    ]
+
+    shutil.copy(source_file_path, parsed_file_path)
+    main.inject_default_parents(parsed_file_path, cfgs)
+
+    with open(parsed_file_path, "r") as f:
+        parsed_file_content =  f.read()
+    with open(expected_file_path, "r") as f:
+        expected_file_content =  f.read()
+
+    try:
+        assert parsed_file_content == expected_file_content
+    finally:
+        os.remove(parsed_file_path)

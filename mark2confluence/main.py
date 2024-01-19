@@ -225,6 +225,20 @@ def get_default_parents(parents_string: str) -> List[ParentCfg]:
     default_parents.append(ParentCfg(directory, space, parents))
   return default_parents
 
+def inject_default_parents(path: str, default_parents_cfg: List[ParentCfg]):
+  global cfg
+  file_dir = f"{os.path.dirname(os.path.relpath(path))}/"
+  for parent_cfg in default_parents_cfg:
+    cfg_abs_dir = f"{cfg.github.WORKSPACE}/{parent_cfg.directory}"
+    if os.path.isdir(cfg_abs_dir) and os.path.samefile(file_dir, cfg_abs_dir):
+      header = parent_cfg.get_header()
+      with open(path, 'r') as f:
+        file_content = f.read()
+      file_content = f"{header}{file_content}"
+      with open(path, "w") as f:
+        f.write(file_content)
+
+
 def main()->int:
   global cfg
   load_vars()
@@ -247,9 +261,10 @@ def main()->int:
   for path in files:
     if path[-3:] == '.md' and has_mark_headers(path):
       logger.info(f"Processing file {path}")
+      inject_default_parents(path, default_parents)
+
       source_link = f"{ cfg.github.SERVER_URL }/{ cfg.github.REPOSITORY }/blob/{ cfg.github.REF_NAME }/{ path.replace(cfg.github.WORKSPACE, '') }"
       header = tpl.render(source_link=source_link)
-
       inject_header_before_first_line_of_content(path, header)
 
       status[path] = publish(path)
