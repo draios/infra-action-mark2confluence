@@ -100,3 +100,23 @@ def test__parse_parents_string(string, expected_dir, expected_space, expected_pa
 def test_get_default_parents(string, expected_parents_count):
     parents = main.get_default_parents(string)
     assert len(parents) == expected_parents_count
+
+@pytest.mark.parametrize(
+    "cfg,expected_header",
+    [
+        (
+            main.ParentCfg(directory="test",space="FOO",parents=["BAR", "BAZ"]),
+            "<!-- Space: FOO -->\n<!-- Parent: BAR -->\n<!-- Parent: BAZ -->\n",
+        ),
+        (
+            main.ParentCfg(directory="test",space="BAR",parents=["FOO"]),
+            "<!-- Space: BAR -->\n<!-- Parent: FOO -->\n",
+        ),
+        (
+            main.ParentCfg(directory="test",space="FOO",parents=[]),
+            "<!-- Space: FOO -->\n",
+        ),
+    ]
+)
+def test_ParentCfg_get_header(cfg: main.ParentCfg, expected_header):
+    assert cfg.get_header() == expected_header

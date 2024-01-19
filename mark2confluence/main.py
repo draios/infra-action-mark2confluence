@@ -183,10 +183,16 @@ def check_header_template(header_template: str):
     exit(1)
 
 @dataclass
-class DefaultParents():
+class ParentCfg():
   directory: str
   space: str
   parents: List[str]
+
+  def get_header(self) -> str:
+    header = f"<!-- Space: {self.space} -->\n"
+    for parent in self.parents:
+      header += f"<!-- Parent: {parent} -->\n"
+    return header
 
 def _parse_parent_string(parent_string: str) -> Tuple[str, str, List[str]]:
   dir_separator = "="
@@ -210,13 +216,13 @@ def _parse_parent_string(parent_string: str) -> Tuple[str, str, List[str]]:
     logger.error(msg)
     raise ValueError(msg)
 
-def get_default_parents(parents_string: str) -> List[DefaultParents]:
+def get_default_parents(parents_string: str) -> List[ParentCfg]:
   if not parents_string:
     return []
   default_parents = list()
   for parent_string in parents_string.split("\n"):
     directory, space, parents = _parse_parent_string(parent_string)
-    default_parents.append(DefaultParents(directory, space, parents))
+    default_parents.append(ParentCfg(directory, space, parents))
   return default_parents
 
 def main()->int:
