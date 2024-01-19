@@ -32,7 +32,32 @@ FILES: "" # space separated list of file to upload (relative to the repo root di
           # if FILES is defined; DOC_DIR, DOC_DIR_PATTERN and MODIFIED_INTERVAL are ignored
 HEADER_TEMPLATE: "---\n\n**WARNING**: This page is automatically generated from [this source code]({{source_link}})\n\n---\n<!-- Include: ac:toc -->\n\n" # This is a jinja template used as header, source_link is automatically resolved as github source url of the current file
 MERMAID_PROVIDER: "" # Defines the mermaid provider to use. Supported options are: cloudscript, mermaid-go
+default_parents: "" # Automatically inject space and parents headers for the files under the specified directory, format: DIR=SPACE->PARENT1->PARENT2, each definition is separated by a newline
 ```
+
+### Automatically creating space and parent headers
+
+If you want to avoid to copy and paste the same space and parents for every MD file, you can use the `default_parents` input.
+Based on the content of the file it will automatically prepend headers before pushing the file onto confluence.
+Only the file with `mark` headers will be modified.
+
+Let's take this example:
+
+```yaml
+default_headers: |
+  tests/=FOO->Tests
+  mark2confluence/=FOO->Code
+```
+
+Every `markdawn` file under the `tests` directory that already contains mark headers will be prepended the following headers:
+```markdown
+<!-- Space: FOO -->
+<!-- Parent: Tests -->
+
+<your-content>
+```
+
+The directive is only valid for the specified directory, in the example above files places under `tests/integration/` will not have the headers appended.
 
 ## Example workflow
 

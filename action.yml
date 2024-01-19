@@ -37,6 +37,10 @@ inputs:
     description: "Defines the mermaid provider to use. Supported options are: cloudscript, mermaid-go"
     required: false
     default: ""
+  default_parents:
+    description: "Automatically inject space and parents headers for the files under the specified directory, format: DIR=SPACE->PARENT1->PARENT2, each definition is separated by a newline"
+    required: false
+    default: ""
 runs:
   using: "docker"
   image: Dockerfile
