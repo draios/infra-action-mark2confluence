@@ -81,9 +81,22 @@ def test_inject_header(file, expected_index, raises):
 def test__parse_parents_string(string, expected_dir, expected_space, expected_parents, raises):
     if raises:
         with pytest.raises(ValueError, match=r"^default_parents.+"):
-            main._parse_parents_string(string)
+            main._parse_parent_string(string)
     else:
-        directory, space, parents = main._parse_parents_string(string)
+        directory, space, parents = main._parse_parent_string(string)
         assert directory == expected_dir
         assert space == expected_space
         assert parents == expected_parents
+
+@pytest.mark.parametrize(
+    "string,expected_parents_count",
+    [
+        ("tools/=foo", 1),
+        ("tools/=foo\ntools/=foo", 2),
+        ("", 0),
+        (None, 0)
+    ]
+)
+def test_get_default_parents(string, expected_parents_count):
+    parents = main.get_default_parents(string)
+    assert len(parents) == expected_parents_count

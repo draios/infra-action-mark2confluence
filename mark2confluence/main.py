@@ -9,6 +9,7 @@ import jinja2
 from loguru import logger
 from supermutes import dot
 from pprint import pformat
+from dataclasses import dataclass
 
 ACTION_PUBLISH = "publish"
 ACTION_DRY_RUN = "dry-run"
@@ -181,14 +182,20 @@ def check_header_template(header_template: str):
     logger.error(f"Setup error, HEADER_TEMPLATE: {e}")
     exit(1)
 
-def _parse_parents_string(parents_string: str) -> Tuple[str, str, List[str]]:
+@dataclass
+class DefaultParents():
+  directory: str
+  space: str
+  parents: List[str]
+
+def _parse_parent_string(parent_string: str) -> Tuple[str, str, List[str]]:
   dir_separator = "="
   spaces_separator = "->"
   try:
-    parents_string_regex = re.compile(rf".+=.+({spaces_separator}.+)*")
-    if not parents_string_regex.match(parents_string) or parents_string.endswith(spaces_separator):
+    parent_string_regex = re.compile(rf".+=.+({spaces_separator}.+)*")
+    if not parent_string_regex.match(parent_string) or parent_string.endswith(spaces_separator):
       raise ValueError
-    directory, space_and_parents = parents_string.split(dir_separator)
+    directory, space_and_parents = parent_string.split(dir_separator)
     space_and_parents_splitted = space_and_parents.split(spaces_separator)
     space = space_and_parents_splitted[0]
     parents = space_and_parents_splitted[1::]
@@ -199,9 +206,18 @@ def _parse_parents_string(parents_string: str) -> Tuple[str, str, List[str]]:
 
     return directory, space, parents
   except ValueError:
-    msg = f"default_parents must follow the format DIR=SPACE[->PARENT1->PARENT2], provided: {parents_string}"
+    msg = f"default_parents must follow the format DIR=SPACE[->PARENT1->PARENT2], provided: {parent_string}"
     logger.error(msg)
     raise ValueError(msg)
+
+def get_default_parents(parents_string: str) -> List[DefaultParents]:
+  if not parents_string:
+    return []
+  default_parents = list()
+  for parent_string in parents_string.split("\n"):
+    directory, space, parents = _parse_parent_string(parent_string)
+    default_parents.append(DefaultParents(directory, space, parents))
+  return default_parents
 
 def main()->int:
   global cfg
@@ -220,7 +236,7 @@ def main()->int:
 
   logger.info(f"Files to be processed: {', '.join(files)}")
 
-
+  default_parents = get_default_parents(cfg.inputs.default_parents)
   status = {}
   for path in files:
     if path[-3:] == '.md' and has_mark_headers(path):
