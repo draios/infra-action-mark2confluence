@@ -237,7 +237,6 @@ def get_default_parents(parents_string: str) -> List[ParentCfg]:
   return default_parents
 
 def inject_default_parents(path: str, default_parents_cfg: List[ParentCfg]):
-  global cfg
   file_dir = f"{os.path.dirname(os.path.abspath(path))}"
   for parent_cfg in default_parents_cfg:
     if parent_cfg.is_directory_included(file_dir):
