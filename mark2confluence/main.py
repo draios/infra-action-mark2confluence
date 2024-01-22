@@ -265,7 +265,7 @@ def main()->int:
 
   logger.info(f"Files to be processed: {', '.join(files)}")
 
-  default_parents = get_default_parents(cfg.inputs.default_parents)
+  default_parents = get_default_parents(cfg.inputs.DEFAULT_PARENTS)
   status = {}
   for path in files:
     if path[-3:] == '.md' and has_mark_headers(path):
