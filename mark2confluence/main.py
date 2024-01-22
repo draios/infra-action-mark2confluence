@@ -100,7 +100,7 @@ def publish(path: str)-> tuple:
 
 
 def has_mark_headers(path: str) -> bool:
-  space_re = re.compile("<!--.?[Ss]pace:.*-->", re.MULTILINE)
+  space_re = re.compile("<!--.?(space|parent|title):.*-->", re.IGNORECASE)
   with open(path, 'r+') as f:
     data = f.read().split("\n")
     for line in data:

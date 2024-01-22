@@ -34,7 +34,9 @@ def test_load_env_prefixes():
 
 def test_has_mark_headers():
     resource_directory = f"{RESOURCE_DIR}/markdown/test_has_mark_headers"
-    assert main.has_mark_headers(f"{resource_directory}/with_mark_headers.md")
+    assert main.has_mark_headers(f"{resource_directory}/with_mark_space_header.md")
+    assert main.has_mark_headers(f"{resource_directory}/with_mark_parent_header.md")
+    assert main.has_mark_headers(f"{resource_directory}/with_mark_title_header.md")
     assert not main.has_mark_headers(f"{resource_directory}/without_mark_headers.md")
 
 def test_check_header_template():
