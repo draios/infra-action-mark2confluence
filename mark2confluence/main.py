@@ -228,7 +228,9 @@ def get_default_parents(parents_string: str) -> List[ParentCfg]:
   if not parents_string:
     return []
   default_parents = list()
-  for parent_string in parents_string.split("\n"):
+  parents_string_array = parents_string.split("\n")
+  parents_string_array = list(filter(lambda x: x, parents_string_array))
+  for parent_string in parents_string_array:
     directory, space, parents = _parse_parent_string(parent_string)
     default_parents.append(ParentCfg(directory, space, parents))
   default_parents.sort(key=lambda cfg: len(cfg.directory), reverse=True)

@@ -94,6 +94,7 @@ def test__parse_parents_string(string, expected_dir, expected_space, expected_pa
     "string,expected_parents_count",
     [
         ("tools/=foo", 1),
+        ("tools/=foo\n", 1),
         ("tools/=foo\ntools/=foo", 2),
         ("", 0),
         (None, 0)
