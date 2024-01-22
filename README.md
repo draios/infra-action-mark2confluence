@@ -57,7 +57,15 @@ Every `markdawn` file under the `tests` directory that already contains mark hea
 <your-content>
 ```
 
-The directive is only valid for the specified directory, in the example above files places under `tests/integration/` will not have the headers appended.
+The directive supports glob matching and prioritize the longest directory first, for example:
+
+```yaml
+default_headers: |
+  tests/**=FOO->Tests
+  tests/resources/**=FOO->Tests->Resources
+```
+
+Files under `tests/resources/` will have `FOO->Tests->Resources` as headers, while files under `tests/other-dir` will have `FOO->Tests`.
 
 ## Example workflow
 

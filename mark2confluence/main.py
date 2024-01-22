@@ -4,6 +4,7 @@ import sys
 import re
 import subprocess
 from datetime import datetime,timedelta
+from fnmatch import fnmatch
 from typing import List, Tuple
 import jinja2
 from loguru import logger
@@ -194,6 +195,13 @@ class ParentCfg():
       header += f"<!-- Parent: {parent} -->\n"
     return header
 
+  def is_directory_included(self, directory: str) -> bool:
+    global cfg
+    sanitized_dir = directory.replace(f"{cfg.github.WORKSPACE}/", "")
+    if not sanitized_dir.endswith("/"):
+      sanitized_dir += "/"
+    return fnmatch(sanitized_dir, self.directory)
+
 def _parse_parent_string(parent_string: str) -> Tuple[str, str, List[str]]:
   dir_separator = "="
   spaces_separator = "->"
@@ -223,20 +231,21 @@ def get_default_parents(parents_string: str) -> List[ParentCfg]:
   for parent_string in parents_string.split("\n"):
     directory, space, parents = _parse_parent_string(parent_string)
     default_parents.append(ParentCfg(directory, space, parents))
+  default_parents.sort(key=lambda cfg: len(cfg.directory), reverse=True)
   return default_parents
 
 def inject_default_parents(path: str, default_parents_cfg: List[ParentCfg]):
   global cfg
-  file_dir = f"{os.path.dirname(os.path.relpath(path))}/"
+  file_dir = f"{os.path.dirname(os.path.abspath(path))}"
   for parent_cfg in default_parents_cfg:
-    cfg_abs_dir = f"{cfg.github.WORKSPACE}/{parent_cfg.directory}"
-    if os.path.isdir(cfg_abs_dir) and os.path.samefile(file_dir, cfg_abs_dir):
+    if parent_cfg.is_directory_included(file_dir):
       header = parent_cfg.get_header()
       with open(path, 'r') as f:
         file_content = f.read()
       file_content = f"{header}{file_content}"
       with open(path, "w") as f:
         f.write(file_content)
+      return
 
 
 def main()->int:

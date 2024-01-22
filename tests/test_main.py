@@ -1,10 +1,12 @@
 import os
 import pytest
 import shutil
+from supermutes import dot
 
 import mark2confluence.main as main
 
 RESOURCE_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/resources"
+WORKSPACE = os.path.realpath(f"{os.path.dirname(os.path.abspath(__file__))}/..")
 
 def clean_github_environment_variables():
     if(os.getenv("CI", False)):
@@ -121,17 +123,24 @@ def test_get_default_parents(string, expected_parents_count):
 def test_ParentCfg_get_header(cfg: main.ParentCfg, expected_header):
     assert cfg.get_header() == expected_header
 
-def test_inject_default_parents():
+def test_inject_default_parents(monkeypatch):
+    monkeypatch.setattr('mark2confluence.main.cfg', dot.dotify({"github": {"WORKSPACE": WORKSPACE}}))
+
     base_dir = f"{RESOURCE_DIR}/markdown/test_inject_default_parents"
     source_file_path = f"{base_dir}/0-input.md"
     expected_file_path = f"{base_dir}/0-output.md"
-    parsed_file_path = "tests/parsed_file.md"
+    parsed_file_dir = f"{WORKSPACE}/tests/foo"
+    parsed_file_path = f"{parsed_file_dir}/parsed_file.md"
     cfgs = [
-        main.ParentCfg(directory="tests/", space="FOO", parents=["BAR"]),
+        main.ParentCfg(directory="tests/foo/bar", space="FOO", parents=["BAZ"]),
+        main.ParentCfg(directory="tests/foo/*", space="FOO", parents=["BAR"]),
+        main.ParentCfg(directory="tests/*", space="FOO", parents=["BAZ"]),
         main.ParentCfg(directory="mark2confluence/", space="BOZ", parents=["BIZ"]),
     ]
 
+    os.makedirs(parsed_file_dir, exist_ok=True)
     shutil.copy(source_file_path, parsed_file_path)
+
     main.inject_default_parents(parsed_file_path, cfgs)
 
     with open(parsed_file_path, "r") as f:
@@ -142,4 +151,4 @@ def test_inject_default_parents():
     try:
         assert parsed_file_content == expected_file_content
     finally:
-        os.remove(parsed_file_path)
+        shutil.rmtree(parsed_file_dir)
