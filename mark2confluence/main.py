@@ -4,11 +4,13 @@ import sys
 import re
 import subprocess
 from datetime import datetime,timedelta
+from fnmatch import fnmatch
 from typing import List, Tuple
 import jinja2
 from loguru import logger
 from supermutes import dot
 from pprint import pformat
+from dataclasses import dataclass
 
 ACTION_PUBLISH = "publish"
 ACTION_DRY_RUN = "dry-run"
@@ -34,6 +36,7 @@ DEFAULT_INPUTS = {
   "CONFLUENCE_USERNAME": "",
   "CONFLUENCE_BASE_URL": "",
   "MERMAID_PROVIDER": "",
+  "DEFAULT_PARENTS": "",
 }
 
 DEFAULT_GITHUB = {
@@ -98,7 +101,7 @@ def publish(path: str)-> tuple:
 
 
 def has_mark_headers(path: str) -> bool:
-  space_re = re.compile("<!--.?[Ss]pace:.*-->", re.MULTILINE)
+  space_re = re.compile("<!--.?(space|parent|title):.*-->", re.IGNORECASE)
   with open(path, 'r+') as f:
     data = f.read().split("\n")
     for line in data:
@@ -181,6 +184,71 @@ def check_header_template(header_template: str):
     logger.error(f"Setup error, HEADER_TEMPLATE: {e}")
     exit(1)
 
+@dataclass
+class ParentCfg():
+  directory: str
+  space: str
+  parents: List[str]
+
+  def get_header(self) -> str:
+    header = f"<!-- Space: {self.space} -->\n"
+    for parent in self.parents:
+      header += f"<!-- Parent: {parent} -->\n"
+    return header
+
+  def is_directory_included(self, directory: str) -> bool:
+    global cfg
+    sanitized_dir = directory.replace(f"{cfg.github.WORKSPACE}/", "")
+    if not sanitized_dir.endswith("/"):
+      sanitized_dir += "/"
+    return fnmatch(sanitized_dir, self.directory)
+
+def _parse_parent_string(parent_string: str) -> Tuple[str, str, List[str]]:
+  dir_separator = "="
+  spaces_separator = "->"
+  try:
+    parent_string_regex = re.compile(rf".+=.+({spaces_separator}.+)*")
+    if not parent_string_regex.match(parent_string) or parent_string.endswith(spaces_separator):
+      raise ValueError
+    directory, space_and_parents = parent_string.split(dir_separator)
+    space_and_parents_splitted = space_and_parents.split(spaces_separator)
+    space = space_and_parents_splitted[0]
+    parents = space_and_parents_splitted[1::]
+
+    if not directory or not space:
+      raise ValueError
+
+
+    return directory, space, parents
+  except ValueError:
+    msg = f"default_parents must follow the format DIR=SPACE[->PARENT1->PARENT2], provided: {parent_string}"
+    logger.error(msg)
+    raise ValueError(msg)
+
+def get_default_parents(parents_string: str) -> List[ParentCfg]:
+  if not parents_string:
+    return []
+  default_parents = list()
+  parents_string_array = parents_string.split("\n")
+  parents_string_array = list(filter(lambda x: x, parents_string_array))
+  for parent_string in parents_string_array:
+    directory, space, parents = _parse_parent_string(parent_string)
+    default_parents.append(ParentCfg(directory, space, parents))
+  default_parents.sort(key=lambda cfg: len(cfg.directory), reverse=True)
+  return default_parents
+
+def inject_default_parents(path: str, default_parents_cfg: List[ParentCfg]):
+  file_dir = f"{os.path.dirname(os.path.abspath(path))}"
+  for parent_cfg in default_parents_cfg:
+    if parent_cfg.is_directory_included(file_dir):
+      header = parent_cfg.get_header()
+      with open(path, 'r') as f:
+        file_content = f.read()
+      file_content = f"{header}{file_content}"
+      with open(path, "w") as f:
+        f.write(file_content)
+      return
+
 
 def main()->int:
   global cfg
@@ -199,14 +267,15 @@ def main()->int:
 
   logger.info(f"Files to be processed: {', '.join(files)}")
 
-
+  default_parents = get_default_parents(cfg.inputs.DEFAULT_PARENTS)
   status = {}
   for path in files:
     if path[-3:] == '.md' and has_mark_headers(path):
       logger.info(f"Processing file {path}")
+      inject_default_parents(path, default_parents)
+
       source_link = f"{ cfg.github.SERVER_URL }/{ cfg.github.REPOSITORY }/blob/{ cfg.github.REF_NAME }/{ path.replace(cfg.github.WORKSPACE, '') }"
       header = tpl.render(source_link=source_link)
-
       inject_header_before_first_line_of_content(path, header)
 
       status[path] = publish(path)
