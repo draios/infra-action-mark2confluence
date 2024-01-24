@@ -9,7 +9,7 @@ RUN pip install --target=/app -r requirements.txt && \
     tar -xvzf mark_Linux_x86_64.tar.gz && chmod +x mark && mv mark /usr/local/bin/mark && rm mark_Linux_x86_64.tar.gz \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-FROM chromedp/headless-shell:latest
+FROM chromedp/headless-shell:114.0.5735.199
 RUN apt-get update \
 && apt-get install --no-install-recommends -qq ca-certificates bash sed git dumb-init python3 \
 && apt-get clean \
