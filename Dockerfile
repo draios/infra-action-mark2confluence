@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm AS builder
+FROM python:3.11-slim AS builder
 ENV MARK="9.11.1"
 ADD . /app
 WORKDIR /app
