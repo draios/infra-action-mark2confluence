@@ -32,12 +32,13 @@ def test_load_env_prefixes():
     assert main.cfg.actions["FOO"] == "foo"
     assert main.cfg.runner["FOO"] == "foo"
 
-def test_has_mark_headers():
-    resource_directory = f"{RESOURCE_DIR}/markdown/test_has_mark_headers"
-    assert main.has_mark_headers(f"{resource_directory}/with_mark_space_header.md")
-    assert main.has_mark_headers(f"{resource_directory}/with_mark_parent_header.md")
-    assert main.has_mark_headers(f"{resource_directory}/with_mark_title_header.md")
-    assert not main.has_mark_headers(f"{resource_directory}/without_mark_headers.md")
+def test_begins_with_mark_headers():
+    resource_directory = f"{RESOURCE_DIR}/markdown/test_begins_with_mark_headers"
+    assert main.begins_with_mark_headers(f"{resource_directory}/with_mark_space_header.md")
+    assert main.begins_with_mark_headers(f"{resource_directory}/with_mark_parent_header.md")
+    assert main.begins_with_mark_headers(f"{resource_directory}/with_mark_title_header.md")
+    assert not main.begins_with_mark_headers(f"{resource_directory}/without_mark_headers.md")
+    assert not main.begins_with_mark_headers(f"{resource_directory}/with_mark_headers_in_the_content.md")
 
 def test_check_header_template():
     assert main.check_header_template("Valid Jinja2 {{ var }}")

@@ -100,12 +100,12 @@ def publish(path: str)-> tuple:
   return True, None
 
 
-def has_mark_headers(path: str) -> bool:
-  space_re = re.compile("<!--.?(space|parent|title):.*-->", re.IGNORECASE)
+def begins_with_mark_headers(path: str, headers: List[str] = ["Space", "Parent", "Title"]) -> bool:
   with open(path, 'r+') as f:
-    data = f.read().split("\n")
-    for line in data:
-      if space_re.match(line):
+    first_row = f.readline()
+    for header in headers:
+      regex = re.compile(f"^<!--.?{header}:.*-->")
+      if regex.match(first_row):
         return True
   return False
 
@@ -270,7 +270,7 @@ def main()->int:
   default_parents = get_default_parents(cfg.inputs.DEFAULT_PARENTS)
   status = {}
   for path in files:
-    if path[-3:] == '.md' and has_mark_headers(path):
+    if path[-3:] == '.md' and begins_with_mark_headers(path):
       logger.info(f"Processing file {path}")
       inject_default_parents(path, default_parents)
 
