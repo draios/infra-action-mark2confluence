@@ -109,8 +109,8 @@ def begins_with_mark_headers(path: str, headers: List[str] = ["Space", "Parent",
         return True
   return False
 
-def has_mark_space_header(path: str):
-  return has_mark_headers(path, r"<!--.?(space):.*-->")
+def begins_with_mark_space_header(path: str):
+  return begins_with_mark_headers(path, ["Space"])
 
 class MultilineCommentIsOpenException(Exception):
     pass
@@ -243,7 +243,7 @@ def get_default_parents(parents_string: str) -> List[ParentCfg]:
 def inject_default_parents(path: str, default_parents_cfg: List[ParentCfg]):
   file_dir = f"{os.path.dirname(os.path.abspath(path))}"
   for parent_cfg in default_parents_cfg:
-    if parent_cfg.is_directory_included(file_dir) and not has_mark_space_header(path):
+    if parent_cfg.is_directory_included(file_dir) and not begins_with_mark_space_header(path):
       header = parent_cfg.get_header()
       with open(path, 'r') as f:
         file_content = f.read()
