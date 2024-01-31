@@ -127,14 +127,22 @@ def test_get_default_parents(string, expected_parents_count):
 def test_ParentCfg_get_header(cfg: main.ParentCfg, expected_header):
     assert cfg.get_header() == expected_header
 
-def test_inject_default_parents(monkeypatch):
+@pytest.mark.parametrize(
+  ids=("skip file with space mark header", "properly inject default headers"),
+  argnames="tested_file_name, expected_file_name",
+  argvalues=[
+      ("0-input.md", "0-output.md"),
+      ("1-input.md", "1-output.md"),
+  ],
+)
+def test_inject_default_parents(monkeypatch, tested_file_name, expected_file_name):
     monkeypatch.setattr('mark2confluence.main.cfg', dot.dotify({"github": {"WORKSPACE": WORKSPACE}}))
 
     base_dir = f"{RESOURCE_DIR}/markdown/test_inject_default_parents"
-    source_file_path = f"{base_dir}/0-input.md"
-    expected_file_path = f"{base_dir}/0-output.md"
-    parsed_file_dir = f"{WORKSPACE}/tests/foo"
-    parsed_file_path = f"{parsed_file_dir}/parsed_file.md"
+    source_file_path = os.path.join(base_dir, tested_file_name)
+    expected_file_path = os.path.join(base_dir, expected_file_name)
+    parsed_file_dir = os.path.join(WORKSPACE, "tests", "foo")
+    parsed_file_path = os.path.join(parsed_file_dir, "parsed_file.md")
     cfgs = [
         main.ParentCfg(directory="tests/foo/bar", space="FOO", parents=["BAZ"]),
         main.ParentCfg(directory="tests/foo/*", space="FOO", parents=["BAR"]),
