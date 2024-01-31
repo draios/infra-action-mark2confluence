@@ -104,7 +104,7 @@ def begins_with_mark_headers(path: str, headers: List[str] = ["Space", "Parent",
   with open(path, 'r+') as f:
     first_row = f.readline()
     for header in headers:
-      regex = re.compile(f"^<!--.?{header}:.*-->")
+      regex = re.compile(f"^<!--.?{header}:.*-->", re.IGNORECASE)
       if regex.match(first_row):
         return True
   return False
