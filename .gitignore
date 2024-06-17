@@ -1,5 +1,6 @@
 .task/*
 .venv
+venv/
 publish.sh
 main.sh
 __pycache__
