@@ -89,7 +89,9 @@ def publish(path: str)-> tuple:
   proc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd = os.path.dirname(path))
 
   try:
-    _, errs = proc.communicate(timeout=120)
+    out, errs = proc.communicate(timeout=120)
+    if cfg.inputs.ACTION == ACTION_VERIFY:
+      logger.info(f"Verify: mark compiled html: {out}")
   except subprocess.TimeoutExpired:
     proc.kill()
     _, errs = proc.communicate()
