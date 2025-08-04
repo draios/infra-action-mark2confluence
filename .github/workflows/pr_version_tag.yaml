@@ -30,7 +30,7 @@ jobs:
         run: |
           PR_NUMBER=${{ github.event.number }}
           CURRENT_VERSION="${{ steps.get_version.outputs.current_version }}"
-          PR_TAG="${CURRENT_VERSION}-dev-PR${PR_NUMBER}"
+          PR_TAG="v${CURRENT_VERSION}-dev-PR${PR_NUMBER}"
 
           echo "Processing PR tag: $PR_TAG"
 
