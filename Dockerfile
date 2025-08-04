@@ -1,5 +1,5 @@
-FROM python:3-slim AS builder
-ENV MARK="9.12.0"
+FROM python:3.12-slim AS builder
+ENV MARK="14.1.11"
 
 ADD . /app
 WORKDIR /app
@@ -13,7 +13,7 @@ RUN pip install --target=/app -r requirements.txt && \
     && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
     && apt update && apt-get install -y google-chrome-stable
 
-FROM python:3-slim
+FROM python:3.12-slim
 COPY --from=builder /app /app
 COPY --from=builder /usr/local/bin/mark /usr/bin/mark
 COPY --from=builder /usr/bin/google-chrome /usr/bin/google-chrome

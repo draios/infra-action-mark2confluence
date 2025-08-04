@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+[dev-packages]
+pytest = ">=7.0.1"
+
+[requires]
+python_version = "3.12"
+
+[scripts]
+mark2confluence = "python mark2confluence/main.py"

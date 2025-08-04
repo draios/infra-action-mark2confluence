@@ -4,6 +4,77 @@ GitHub Action for converting markdown files into Confluence pages
 
 This Action uses [mark](https://github.com/kovetskiy/mark) to accomplish this task
 
+## Installation
+
+This project uses `requirements.txt` as the single source of truth for dependencies. Both Poetry and Pipenv can natively read from requirements.txt.
+
+### Quick Setup (Recommended)
+
+```bash
+# Using Poetry
+make install-poetry
+
+# Or using Pipenv
+make install-pipenv
+```
+
+### Manual Installation
+
+#### Using Poetry
+
+```bash
+# Install Poetry if you haven't already
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Install dependencies from requirements.txt
+poetry add -r requirements.txt
+
+# Run the application
+poetry run mark2confluence
+```
+
+#### Using Pipenv
+
+```bash
+# Install Pipenv if you haven't already
+pip install pipenv
+
+# Install dependencies from requirements.txt
+pipenv install -r requirements.txt
+
+# Run the application
+pipenv run mark2confluence
+```
+
+#### Using pip
+
+```bash
+# Install from requirements.txt
+pip install -r requirements.txt
+
+# Or install in development mode
+pip install -e .
+
+# Run the application
+python mark2confluence/main.py
+```
+
+### Managing Dependencies
+
+When you update `requirements.txt`, update your preferred package manager:
+
+```bash
+# For Poetry
+poetry add -r requirements.txt
+
+# For Pipenv
+pipenv install -r requirements.txt
+
+# Or use make commands
+make sync-poetry
+make sync-pipenv
+```
+
 ## Inputs
 
 ### Required
