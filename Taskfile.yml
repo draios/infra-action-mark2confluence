@@ -46,7 +46,7 @@ tasks:
 
   dependency-install:
     cmds:
-      - . .venv/bin/activate && pip3 install -r requirements.txt
+      - .venv/bin/pip3 install -r requirements.txt
     sources:
       - requirements.txt
     method: checksum
@@ -66,7 +66,7 @@ tasks:
     desc: Run tests
     cmds:
       - task: setup
-      - . .venv/bin/activate && pytest -v .
+      - .venv/bin/pytest -v .
 
   clean:
     desc: Cleanup
