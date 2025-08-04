@@ -4,7 +4,7 @@ name = "mark2confluence"
 # and it is automatically updated by the GHA
 version = "0.3.0"
 description = "A GitHub Action to convert Markdown files to Confluence pages using mark"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Devops <devops@sysdig.com>"]
 readme = "README.md"
 packages = [{include = "mark2confluence"}]
 
