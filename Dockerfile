@@ -18,9 +18,9 @@ COPY --from=builder /app /app
 COPY --from=builder /usr/local/bin/mark /usr/bin/mark
 COPY --from=builder /usr/bin/google-chrome /usr/bin/google-chrome
 WORKDIR /app
-ENV PYTHONPATH /app
-ENV DOC_PREFIX /github/workspace/
-ENV LOGURU_FORMAT "<lvl>{level:7} {message}</lvl>"
+ENV PYTHONPATH=/app
+ENV DOC_PREFIX=/github/workspace/
+ENV LOGURU_FORMAT="<lvl>{level:7} {message}</lvl>"
 USER 1001:1001
 ENTRYPOINT [ "python" ]
 CMD ["/app/mark2confluence/main.py"]
