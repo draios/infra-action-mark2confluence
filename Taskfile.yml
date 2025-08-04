@@ -46,8 +46,7 @@ tasks:
 
   dependency-install:
     cmds:
-      - source .venv/bin/activate
-      - pip3 install -r requirements.txt
+      - . .venv/bin/activate && pip3 install -r requirements.txt
     sources:
       - requirements.txt
     method: checksum
@@ -55,8 +54,8 @@ tasks:
   setup:
     desc: Bootstrap dev environment
     preconditions:
-      - sh: "[ $(python3 --version | cut -d ' ' -f 2 | awk -F'.' '{print ($2 > 6) }') = 1 ]"
-        msg: "Required python version not found (>=3.6)"
+      - sh: "[ $(python3 --version | cut -d ' ' -f 2 | awk -F'.' '{print ($2 > 12) }') = 1 ]"
+        msg: "Required python version not found (>=3.12)"
     cmds:
       - task: pre-commit-setup
       - task: virtualenv
@@ -67,7 +66,7 @@ tasks:
     desc: Run tests
     cmds:
       - task: setup
-      - source .venv/bin/activate && pytest -v .
+      - . .venv/bin/activate && pytest -v .
 
   clean:
     desc: Cleanup
