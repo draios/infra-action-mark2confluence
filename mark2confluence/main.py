@@ -89,12 +89,10 @@ def publish(path: str)-> tuple:
   cmd_parts = ['mark']
 
   # Add required flags only if values are provided
-  # For dry-run mode, use fake credentials if not provided
-  if cfg.inputs.ACTION == ACTION_DRY_RUN:
-    password = cfg.inputs.CONFLUENCE_PASSWORD if cfg.inputs.CONFLUENCE_PASSWORD else "fake-password"
-    username = cfg.inputs.CONFLUENCE_USERNAME if cfg.inputs.CONFLUENCE_USERNAME else "fake-user"
-    base_url = cfg.inputs.CONFLUENCE_BASE_URL if cfg.inputs.CONFLUENCE_BASE_URL else "https://fake.atlassian.net"
-    cmd_parts.extend(['-p', password, '-u', username, '-b', base_url])
+  # For verify mode, no credentials needed
+  if cfg.inputs.ACTION == ACTION_VERIFY:
+    # No credentials needed for verify mode
+    pass
   else:
     # For real operations, require actual credentials
     if cfg.inputs.CONFLUENCE_PASSWORD:

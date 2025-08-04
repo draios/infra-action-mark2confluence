@@ -74,14 +74,14 @@ jobs:
           ```
           EOF
 
-      - name: Test action with dry-run
-        id: dry-run-test
+      - name: Test action with verify mode
+        id: verify-test
         run: |
-          echo "Testing action with dry-run mode..."
+          echo "Testing action with verify mode..."
 
-          # Test the action with dry-run
+          # Test the action with verify mode (compile-only, no credentials needed)
           docker run --rm \
-            -e INPUT_ACTION=dry-run \
+            -e INPUT_ACTION=verify \
             -e INPUT_DOC_DIR=test-docs \
             -e INPUT_DOC_DIR_PATTERN=".*\\.md$" \
             -e INPUT_HEADER_TEMPLATE="---\n\n**Generated from**: {{ source_link }}\n\n---\n" \
@@ -93,16 +93,16 @@ jobs:
             -v $(pwd):/workspace \
             mark2confluence:pr-test /workspace/mark2confluence/main.py
 
-          echo "✅ Dry-run test completed successfully"
+          echo "✅ Verify test completed successfully"
 
       - name: Test action with specific files
-        id: files-test
+        id: specific-files-test
         run: |
           echo "Testing action with specific files..."
 
           # Test with specific files
           docker run --rm \
-            -e INPUT_ACTION=dry-run \
+            -e INPUT_ACTION=verify \
             -e INPUT_FILES="test-docs/test-page.md test-docs/another-page.md" \
             -e INPUT_HEADER_TEMPLATE="---\n\n**Generated from**: {{ source_link }}\n\n---\n" \
             -e GITHUB_WORKSPACE=/workspace \
@@ -115,13 +115,13 @@ jobs:
           echo "✅ Specific files test completed successfully"
 
       - name: Test action with parent configuration
-        id: parent-test
+        id: parent-config-test
         run: |
           echo "Testing action with parent configuration..."
 
           # Test with default parents configuration
           docker run --rm \
-            -e INPUT_ACTION=dry-run \
+            -e INPUT_ACTION=verify \
             -e INPUT_DOC_DIR=test-docs \
             -e INPUT_DOC_DIR_PATTERN=".*\\.md$" \
             -e INPUT_DEFAULT_PARENTS="test-docs/=TEST->Documentation" \
@@ -136,13 +136,13 @@ jobs:
           echo "✅ Parent configuration test completed successfully"
 
       - name: Test action error handling
-        id: error-test
+        id: error-handling-test
         run: |
           echo "Testing action error handling..."
 
           # Test with invalid configuration (should handle gracefully)
           docker run --rm \
-            -e INPUT_ACTION=dry-run \
+            -e INPUT_ACTION=verify \
             -e INPUT_DOC_DIR=non-existent-dir \
             -e INPUT_DOC_DIR_PATTERN=".*\\.md$" \
             -e GITHUB_WORKSPACE=/workspace \
