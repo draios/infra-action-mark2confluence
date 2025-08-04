@@ -1,5 +1,5 @@
 FROM python:3.12-slim AS builder
-ENV MARK="14.1.11"
+ENV MARK="14.1.1"
 
 ADD . /app
 WORKDIR /app
