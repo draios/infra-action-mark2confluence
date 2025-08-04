@@ -21,5 +21,5 @@ def get_version():
         return "0.1.0"
 
 __version__ = get_version()
-__author__ = "Your Name"
-__email__ = "your.email@example.com"
+__author__ = "Devops"
+__email__ = "devops@sysdig.com"

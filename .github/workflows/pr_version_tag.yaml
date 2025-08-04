@@ -1,0 +1,74 @@
+name: "PR Version Tag"
+on:
+  pull_request:
+    branches: ["main"]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  tag_pr_version:
+    name: "Tag PR Version"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Get current version from pyproject.toml
+        id: get_version
+        run: |
+          python scripts/bump_version.py --get-current
+          echo "current_version=$(python scripts/bump_version.py --get-current)" >> $GITHUB_OUTPUT
+
+      - name: Create PR version tag
+        id: create_tag
+        run: |
+          PR_NUMBER=${{ github.event.number }}
+          CURRENT_VERSION="${{ steps.get_version.outputs.current_version }}"
+          PR_TAG="${CURRENT_VERSION}-dev-PR${PR_NUMBER}"
+
+          echo "Processing PR tag: $PR_TAG"
+
+          # Check if this tag already exists
+          if git rev-parse "$PR_TAG" >/dev/null 2>&1; then
+            echo "Tag $PR_TAG already exists, untagging previous commit..."
+            # Get the commit that was previously tagged
+            PREVIOUS_COMMIT=$(git rev-parse "$PR_TAG")
+            echo "Previous commit: $PREVIOUS_COMMIT"
+
+            # Delete the existing tag (both local and remote)
+            git tag -d "$PR_TAG"
+            git push origin ":refs/tags/$PR_TAG" 2>/dev/null || true
+          else
+            echo "Tag $PR_TAG does not exist, creating new tag..."
+          fi
+
+          # Create new tag pointing to the current commit
+          git tag "$PR_TAG"
+          git push origin "$PR_TAG"
+
+          echo "tag_name=$PR_TAG" >> $GITHUB_OUTPUT
+          echo "Tagged commit: $(git rev-parse HEAD)"
+
+    #   - name: Comment on PR
+    #     uses: actions/github-script@v7
+    #     with:
+    #       script: |
+    #         const tagName = '${{ steps.create_tag.outputs.tag_name }}';
+    #         const comment = `🚀 **PR Version Tag Created**: \`${tagName}\`
+
+    #         This tag represents the current state of this PR and will be updated with each new commit.
+
+    #         You can use this tag to test the specific version of this PR.`;
+
+    #         github.rest.issues.createComment({
+    #           issue_number: context.issue.number,
+    #           owner: context.repo.owner,
+    #           repo: context.repo.repo,
+    #           body: comment
+    #         });

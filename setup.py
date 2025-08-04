@@ -14,7 +14,7 @@ def get_project_metadata():
             "name": poetry_data["name"],
             "version": poetry_data["version"],
             "description": poetry_data["description"],
-            "authors": poetry_data.get("authors", ["Your Name <your.email@example.com>"])
+            "authors": poetry_data.get("authors", ["Devops <devops@sysdig.com>"])
         }
     except (KeyError, FileNotFoundError):
         # Fallback metadata
@@ -22,14 +22,14 @@ def get_project_metadata():
             "name": "mark2confluence",
             "version": "0.1.0",
             "description": "A GitHub Action to convert Markdown files to Confluence pages using mark",
-            "authors": ["Your Name <your.email@example.com>"]
+            "authors": ["Devops <devops@sysdig.com>"]
         }
 
 # Get metadata from pyproject.toml
 metadata = get_project_metadata()
 author_info = metadata["authors"][0].split(" <")
 author_name = author_info[0]
-author_email = author_info[1].rstrip(">") if len(author_info) > 1 else "your.email@example.com"
+author_email = author_info[1].rstrip(">") if len(author_info) > 1 else "devops@sysdig.com"
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -47,9 +47,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     classifiers=[
-        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.12",
