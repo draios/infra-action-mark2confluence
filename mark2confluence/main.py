@@ -30,6 +30,7 @@ DEFAULT_INPUTS = {
   "FILES": "",
   "ACTION": ACTION_DRY_RUN,
   "LOGURU_LEVEL": "INFO",
+  "MARK_LOG_LEVEL": "",
   "HEADER_TEMPLATE": "---\n\n**WARNING**: This page is automatically generated from [this source code]({{ source_link }})\n\n---\n<!-- Include: ac:toc -->\n\n",
   "MODIFIED_INTERVAL": "0",
   "CONFLUENCE_PASSWORD": "",
@@ -84,7 +85,35 @@ def publish(path: str)-> tuple:
   if cfg.inputs.MERMAID_PROVIDER:
     mermaid_provider = f"--mermaid-provider {cfg.inputs.MERMAID_PROVIDER}"
 
-  cmd_line = f'mark -p "{cfg.inputs.CONFLUENCE_PASSWORD}" -u "{cfg.inputs.CONFLUENCE_USERNAME}" -b "{cfg.inputs.CONFLUENCE_BASE_URL}" {mermaid_provider} {other_args} --color never --debug -f {path}'
+  # Build command line with proper flag handling
+  cmd_parts = ['mark']
+
+  # Add required flags only if values are provided
+  if cfg.inputs.CONFLUENCE_PASSWORD:
+    cmd_parts.extend(['-p', cfg.inputs.CONFLUENCE_PASSWORD])
+  if cfg.inputs.CONFLUENCE_USERNAME:
+    cmd_parts.extend(['-u', cfg.inputs.CONFLUENCE_USERNAME])
+  if cfg.inputs.CONFLUENCE_BASE_URL:
+    cmd_parts.extend(['-b', cfg.inputs.CONFLUENCE_BASE_URL])
+
+  # Add optional flags
+  if mermaid_provider:
+    cmd_parts.extend(mermaid_provider.split())
+  if other_args:
+    cmd_parts.extend(other_args.split())
+
+  # Add log level if specified
+  if cfg.inputs.MARK_LOG_LEVEL and cfg.inputs.MARK_LOG_LEVEL.upper() in ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL']:
+    cmd_parts.extend(['--log-level', cfg.inputs.MARK_LOG_LEVEL.upper()])
+  elif os.getenv('MARK_LOG_LEVEL'):
+    cmd_parts.extend(['--log-level', os.getenv('MARK_LOG_LEVEL')])
+  elif cfg.inputs.LOGURU_LEVEL and cfg.inputs.LOGURU_LEVEL.upper() in ['TRACE', 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL']:
+    cmd_parts.extend(['--log-level', cfg.inputs.LOGURU_LEVEL.upper()])
+
+  # Add file path
+  cmd_parts.extend(['-f', path])
+
+  cmd_line = ' '.join(cmd_parts)
   args = shlex.split(cmd_line)
   proc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd = os.path.dirname(path))
 

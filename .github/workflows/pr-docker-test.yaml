@@ -85,6 +85,7 @@ jobs:
             -e INPUT_DOC_DIR=test-docs \
             -e INPUT_DOC_DIR_PATTERN=".*\\.md$" \
             -e INPUT_HEADER_TEMPLATE="---\n\n**Generated from**: {{ source_link }}\n\n---\n" \
+            -e INPUT_MARK_LOG_LEVEL=DEBUG \
             -e GITHUB_WORKSPACE=/workspace \
             -e GITHUB_REPOSITORY=test/mark2confluence \
             -e GITHUB_REF_NAME=main \

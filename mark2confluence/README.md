@@ -43,7 +43,8 @@ The script reads configuration from environment variables with specific prefixes
 | `DOC_DIR_PATTERN` | `".*"` | Regex pattern to match files |
 | `FILES` | `""` | Space-separated list of specific files |
 | `ACTION` | `"dry-run"` | Processing mode: `dry-run`, `publish`, `verify` |
-| `LOGURU_LEVEL` | `"INFO"` | Logging level |
+| `LOGURU_LEVEL` | `"INFO"` | Logging level for the script |
+| `MARK_LOG_LEVEL` | `""` | Logging level for mark tool (TRACE, DEBUG, INFO, WARNING, ERROR, FATAL) |
 | `HEADER_TEMPLATE` | See below | Jinja2 template for page headers |
 | `MODIFIED_INTERVAL` | `"0"` | Only process files modified within N minutes |
 | `CONFLUENCE_PASSWORD` | `""` | Confluence password |
