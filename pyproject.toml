@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "mark2confluence"
+# version here is the soure of truth for the project
+# and it is automatically updated by the GHA
+version = "0.3.0"
+description = "A GitHub Action to convert Markdown files to Confluence pages using mark"
+authors = ["Devops <devops@sysdig.com>"]
+readme = "README.md"
+packages = [{include = "mark2confluence"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+jinja2 = ">=3.0.3"
+pyyaml = ">=6.0"
+pytest = ">=7.0.1"
+loguru = ">=0.5.3"
+supermutes = ">=0.2.5"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0.1"
+
+[tool.poetry.scripts]
+mark2confluence = "mark2confluence.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
