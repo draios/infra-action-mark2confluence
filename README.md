@@ -13,21 +13,25 @@ This project uses `requirements.txt` as the single source of truth for dependenc
 You can use Makefile
 
 ```bash
-# Using Poetry
+# Install Poetry and dependencies
 make install-poetry
+make sync-poetry
 
-# Or using Pipenv
+# Or install Pipenv and dependencies
 make install-pipenv
+make sync-pipenv
 ```
 
 or if you prefer Taskfile
 
 ```bash
-# Using Poetry
+# Install Poetry and dependencies
 task install-poetry
+task sync-poetry
 
-# Or using Pipenv
+# Or install Pipenv and dependencies
 task install-pipenv
+task sync-pipenv
 ```
 
 ### Manual Installation
