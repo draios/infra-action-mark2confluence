@@ -38,11 +38,56 @@ tasks:
     status:
       - which pre-commit
 
-  poetry-setup:
-    cmds:
-      - pip3 install poetry
+  install-poetry:
+    desc: "Install Poetry and dependencies from requirements.txt"
     status:
       - which poetry
+    cmds:
+      - echo "Installing Poetry..."
+      - curl -sSL https://install.python-poetry.org | python3 -
+      - echo "Installing dependencies from requirements.txt..."
+      - poetry install --no-root
+      - |
+        while read -r line; do
+          if [ -n "$line" ] && [ "${line:0:1}" != "#" ]; then
+            poetry add "$line"
+          fi
+        done < requirements.txt
+
+  install-pipenv:
+    desc: "Install Pipenv and dependencies from requirements.txt"
+    status:
+      - which pipenv
+    cmds:
+      - echo "Installing Pipenv..."
+      - pip install pipenv
+      - echo "Installing dependencies from requirements.txt..."
+      - pipenv install -r requirements.txt
+
+  sync-poetry:
+    desc: "Update Poetry dependencies from requirements.txt"
+    sources:
+      - requirements.txt
+    generates:
+      - poetry.lock
+    method: checksum
+    cmds:
+      - |
+        while read -r line; do
+          if [ -n "$line" ] && [ "${line:0:1}" != "#" ]; then
+            poetry add "$line"
+          fi
+        done < requirements.txt
+
+  sync-pipenv:
+    desc: "Update Pipenv dependencies from requirements.txt"
+    sources:
+      - requirements.txt
+    generates:
+      - Pipfile.lock
+    method: checksum
+    cmds:
+      - pipenv install -r requirements.txt
 
   dependency-install:
     cmds:

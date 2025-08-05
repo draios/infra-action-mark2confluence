@@ -10,12 +10,24 @@ This project uses `requirements.txt` as the single source of truth for dependenc
 
 ### Quick Setup (Recommended)
 
+You can use Makefile
+
 ```bash
 # Using Poetry
 make install-poetry
 
 # Or using Pipenv
 make install-pipenv
+```
+
+or if you prefer Taskfile
+
+```bash
+# Using Poetry
+task install-poetry
+
+# Or using Pipenv
+task install-pipenv
 ```
 
 ### Manual Installation
@@ -27,7 +39,7 @@ make install-pipenv
 curl -sSL https://install.python-poetry.org | python3 -
 
 # Install dependencies from requirements.txt
-poetry add -r requirements.txt
+poetry add $(cat requirements.txt)
 
 # Run the application
 poetry run mark2confluence
@@ -65,7 +77,7 @@ When you update `requirements.txt`, update your preferred package manager:
 
 ```bash
 # For Poetry
-poetry add -r requirements.txt
+poetry add $(cat requirements.txt)
 
 # For Pipenv
 pipenv install -r requirements.txt
@@ -73,6 +85,10 @@ pipenv install -r requirements.txt
 # Or use make commands
 make sync-poetry
 make sync-pipenv
+
+# Or use task commands
+task sync-poetry
+task sync-pipenv
 ```
 
 ## Inputs
