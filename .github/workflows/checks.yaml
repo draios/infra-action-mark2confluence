@@ -31,8 +31,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
-      - run: echo "Calculated Next Tag is ${{ steps.tag_version.outputs.tags }}"
-      # use this with ${{needs.job1.outputs.output1}}
+      - run: echo "Calculated Next Tag is ${{ steps.tag_version.outputs.net_tag }}"
   test:
     runs-on: ubuntu-latest
     steps:
