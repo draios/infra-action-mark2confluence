@@ -38,16 +38,51 @@ tasks:
     status:
       - which pre-commit
 
-  poetry-setup:
-    cmds:
-      - pip3 install poetry
+  install-poetry:
+    desc: "Install Poetry"
     status:
       - which poetry
+    cmds:
+      - echo "Installing Poetry..."
+      - curl -sSL https://install.python-poetry.org | python3 -
+
+  install-pipenv:
+    desc: "Install Pipenv"
+    status:
+      - which pipenv
+    cmds:
+      - echo "Installing Pipenv..."
+      - pip install pipenv
+
+  sync-poetry:
+    desc: "Update Poetry dependencies from requirements.txt"
+    sources:
+      - requirements.txt
+    generates:
+      - poetry.lock
+    method: checksum
+    cmds:
+      - poetry install --no-root
+      - |
+        while read -r line; do
+          if [ -n "$line" ] && [ "${line:0:1}" != "#" ]; then
+            poetry add "$line"
+          fi
+        done < requirements.txt
+
+  sync-pipenv:
+    desc: "Update Pipenv dependencies from requirements.txt"
+    sources:
+      - requirements.txt
+    generates:
+      - Pipfile.lock
+    method: checksum
+    cmds:
+      - pipenv install -r requirements.txt
 
   dependency-install:
     cmds:
-      - source .venv/bin/activate
-      - pip3 install -r requirements.txt
+      - .venv/bin/pip3 install -r requirements.txt
     sources:
       - requirements.txt
     method: checksum
@@ -55,8 +90,8 @@ tasks:
   setup:
     desc: Bootstrap dev environment
     preconditions:
-      - sh: "[ $(python3 --version | cut -d ' ' -f 2 | awk -F'.' '{print ($2 > 6) }') = 1 ]"
-        msg: "Required python version not found (>=3.6)"
+      - sh: "[ $(python3 --version | cut -d ' ' -f 2 | awk -F'.' '{print ($2 >= 12) }') = 1 ]"
+        msg: "Required python version not found (>=3.12)"
     cmds:
       - task: pre-commit-setup
       - task: virtualenv
@@ -67,7 +102,7 @@ tasks:
     desc: Run tests
     cmds:
       - task: setup
-      - source .venv/bin/activate && pytest -v .
+      - .venv/bin/pytest -v .
 
   clean:
     desc: Cleanup
