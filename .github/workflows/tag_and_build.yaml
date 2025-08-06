@@ -38,7 +38,7 @@ jobs:
           git commit -m "Bump version to ${{ steps.tag_version.outputs.new_version }}"
           git push
       - run: |
-          echo Calculated Next Tag is ${{ steps.tag_version.outputs.new_tag }}
+          echo "Calculated Next Tag is ${{ steps.tag_version.outputs.new_version }}"
 
   post_slack:
     runs-on: ubuntu-latest
