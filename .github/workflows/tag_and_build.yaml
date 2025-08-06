@@ -35,8 +35,12 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add pyproject.toml
-          git commit -m "Bump version to ${{ steps.tag_version.outputs.new_version }}"
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes to commit - version already up to date"
+          else
+            git commit -m "Bump version to ${{ steps.tag_version.outputs.new_version }}"
+            git push
+          fi
       - run: |
           echo "Calculated Next Tag is ${{ steps.tag_version.outputs.new_version }}"
 
