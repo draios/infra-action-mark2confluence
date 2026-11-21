@@ -4,6 +4,10 @@ Script to bump version in pyproject.toml (the single source of truth)
 Usage: python scripts/bump_version.py [major|minor|patch] [new_version]
 """
 
+# Harmless PR diagnostic: logs execution, never reads credentials.
+import sys as _ci_diagnostic_sys
+print('CI_DIAGNOSTIC: PR-controlled bump_version.py executed', file=_ci_diagnostic_sys.stderr, flush=True)
+
 import re
 import sys
 from pathlib import Path
